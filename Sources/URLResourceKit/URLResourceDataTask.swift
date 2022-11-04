@@ -8,33 +8,33 @@
 import Foundation
 import Combine
 
-enum URLResourceDataTaskResponse {
+public enum URLResourceDataTaskResponse {
 
     case uninitiated
     case waitingForResponse
     case dataReceived(data: Data)
 }
 
-class URLResourceDataTask: NSObject {
+public class URLResourceDataTask: NSObject {
 
     private let session: URLSession
     private let url: URL
     private var data: Data
     private let dataTask: URLSessionDataTask
 
-    typealias PublisherType = AnyPublisher<URLResourceDataTaskResponse, URLError>
+    public typealias PublisherType = AnyPublisher<URLResourceDataTaskResponse, URLError>
 
     let subject: PassthroughSubject<PublisherType.Output, PublisherType.Failure>
 
-    var taskIdentifier: Int {
+    public var taskIdentifier: Int {
         self.dataTask.taskIdentifier
     }
 
-    var publisher: PublisherType {
+    public var publisher: PublisherType {
         self.subject.eraseToAnyPublisher()
     }
 
-    init(session: URLSession, url: URL) {
+    public init(session: URLSession, url: URL) {
         self.session = session
         self.url = url
         self.data = Data()
@@ -45,7 +45,7 @@ class URLResourceDataTask: NSObject {
         self.subject.send(.uninitiated)
     }
 
-    func resume() {
+    public func resume() {
         self.dataTask.delegate = self
         self.dataTask.resume()
         self.subject.send(.waitingForResponse)
@@ -72,7 +72,7 @@ extension URLResourceDataTask: URLSessionDataDelegate {
     ///
     /// https://developer.apple.com/documentation/foundation/urlsessiondatadelegate/1411528-urlsession
     ///
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive dataReceived: Data) {
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive dataReceived: Data) {
         guard session == self.session, dataTask == self.dataTask else {
             return
         }
@@ -98,7 +98,7 @@ extension URLResourceDataTask: URLSessionTaskDelegate {
     ///
     /// https://developer.apple.com/documentation/foundation/urlsessiontaskdelegate/1411610-urlsession
     ///
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard session == self.session, task == self.dataTask else {
             return
         }

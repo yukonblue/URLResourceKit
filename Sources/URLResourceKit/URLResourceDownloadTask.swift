@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-enum URLResourceDownloadTaskProgress {
+public enum URLResourceDownloadTaskProgress {
 
     case uninitiated
     case waitingForResponse
@@ -16,26 +16,26 @@ enum URLResourceDownloadTaskProgress {
     case completed(destinationLocation: URL)
 }
 
-class URLResourceDownloadTask: NSObject {
+public class URLResourceDownloadTask: NSObject {
 
     private let session: URLSession
     private let url: URL
 
     private let downloadTask: URLSessionDownloadTask
 
-    typealias PublisherType = AnyPublisher<URLResourceDownloadTaskProgress, URLError>
+    public typealias PublisherType = AnyPublisher<URLResourceDownloadTaskProgress, URLError>
 
     fileprivate let subject: PassthroughSubject<PublisherType.Output, PublisherType.Failure>
 
-    var taskIdentifier: Int {
+    public var taskIdentifier: Int {
         self.downloadTask.taskIdentifier
     }
-    
-    var publisher: PublisherType {
+
+    public var publisher: PublisherType {
         self.subject.eraseToAnyPublisher()
     }
 
-    init(session: URLSession, url: URL) {
+    public init(session: URLSession, url: URL) {
         self.session = session
         self.url = url
 
@@ -46,7 +46,7 @@ class URLResourceDownloadTask: NSObject {
         self.subject.send(.uninitiated)
     }
 
-    func resume() {
+    public func resume() {
         self.downloadTask.delegate = self
         self.downloadTask.resume()
         self.subject.send(.waitingForResponse)
@@ -56,7 +56,10 @@ class URLResourceDownloadTask: NSObject {
 extension URLResourceDownloadTask: URLSessionDownloadDelegate {
 
     /// Tells the delegate that a download task has finished downloading.
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    public func urlSession(_ session: URLSession,
+                           downloadTask: URLSessionDownloadTask,
+                           didFinishDownloadingTo location: URL
+    ) {
         guard session == self.session, downloadTask == self.downloadTask else {
             return
         }
@@ -66,7 +69,7 @@ extension URLResourceDownloadTask: URLSessionDownloadDelegate {
     }
 
     /// Periodically informs the delegate about the download’s progress.
-    func urlSession(
+    public func urlSession(
         _ session: URLSession,
         downloadTask: URLSessionDownloadTask,
         didWriteData bytesWritten: Int64,
@@ -90,7 +93,7 @@ extension URLResourceDownloadTask: URLSessionDownloadDelegate {
 
 extension URLResourceDownloadTask: URLSessionTaskDelegate {
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard session == self.session, downloadTask == self.downloadTask else {
             return
         }
