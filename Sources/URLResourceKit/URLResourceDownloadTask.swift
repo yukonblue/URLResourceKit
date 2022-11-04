@@ -16,7 +16,18 @@ public enum URLResourceDownloadTaskProgress {
     case completed(destinationLocation: URL)
 }
 
-public class URLResourceDownloadTask: NSObject {
+public protocol URLResourceDownloadTaskProtocol {
+
+    typealias PublisherType = AnyPublisher<URLResourceDownloadTaskProgress, URLError>
+
+    var taskIdentifier: Int { get }
+
+    var publisher: PublisherType { get }
+
+    func resume()
+}
+
+public class URLResourceDownloadTask: NSObject, URLResourceDownloadTaskProtocol {
 
     private let session: URLSession
     private let url: URL

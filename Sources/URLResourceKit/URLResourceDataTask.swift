@@ -15,7 +15,18 @@ public enum URLResourceDataTaskResponse {
     case dataReceived(data: Data)
 }
 
-public class URLResourceDataTask: NSObject {
+public protocol URLResourceDataTaskProtocol {
+
+    typealias PublisherType = AnyPublisher<URLResourceDataTaskResponse, URLError>
+
+    var taskIdentifier: Int { get }
+
+    var publisher: PublisherType { get }
+
+    func resume()
+}
+
+public class URLResourceDataTask: NSObject, URLResourceDataTaskProtocol {
 
     private let session: URLSession
     private let url: URL
